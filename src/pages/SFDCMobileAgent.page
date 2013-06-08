@@ -1,0 +1,430 @@
+<apex:page showHeader="false" docType="html-5.0" standardStyleSheets="false" cache="true" controller="MobileController" >
+<html>
+<head>
+<!-- jQuery Mobile CSS -->
+<link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/jquery.mobile/1.3.0/jquery.mobile-1.3.0.min.css" />
+<!-- jQuery -->
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.2.min.js"></script>
+<!-- Override jQuery Mobile default transitions -->
+<script>
+$(document).bind("mobileinit", function(){
+  $.extend(  $.mobile , {
+    defaultDialogTransition: 'pop',
+    defaultPageTransition: 'fade'
+  });
+});
+</script>
+<!-- jQuery Mobile-->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery.mobile/1.3.0/jquery.mobile-1.3.0.min.js"></script>
+<!-- jqPlot libraries for graphing -->
+<link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.jqplotcss)}" />
+<script src="{!URLFOR($Resource.jqplot)}" ></script> 
+<script src="{!URLFOR($Resource.jqplotbarRenderer)}" ></script> 
+<script src="{!URLFOR($Resource.jqplotpointLabels)}" ></script> 
+<script src="{!URLFOR($Resource.jqplotcategoryAxisRenderer)}" ></script>
+<!-- primary js resource -->
+<script src="{!URLFOR($Resource.SFDCMobileAgentJS)}" ></script>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
+<style>
+	/* base style applied to all pages */
+	.pages {
+		background:rgb(12, 66, 116);
+        color:white;
+        text-align:center;
+		text-shadow:none; }
+	#mainpage .ui-body-b {
+		background:rgb(12, 66, 116);
+        color:white;
+        text-align:center;
+		text-shadow:none; }
+	.dialogs {
+		color:white;
+        text-align:center;
+		text-shadow:none; }
+	/* All h3 elements */
+	h3 {
+		font-family:Helvetica,Arial,sans-serif;
+       	font-weight:bold; }
+	/* All h4 elements */
+	h4 {
+		font-family:Helvetica,Arial,sans-serif;
+     	font-weight:bold; }
+	/* mainpage button text */
+	p.buttonTitle {
+		-webkit-margin-before: 0px;
+		-webkit-margin-after: 1em;
+		text-shadow: 1px 1px 1px black; }
+	/* mainpage buttons and standard icons */
+	#mainchoices .ui-btn {
+		padding-top: 19px;
+		padding-bottom: 20px;
+		padding-left: 3px;
+		padding-right: 3px;
+		background-position: center;
+		background-repeat: no-repeat;
+		background-color: #12E9FC; 
+		margin: 1px; }
+	#mainchoices .ui-btn-inner {
+		border-top: none; }
+	#choice1 .ui-btn {
+		background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/leads_small.png')}); }
+	#choice2 .ui-btn {
+		background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/opptys_small.png')}); }
+	#choice3 .ui-btn {
+		background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/customers_small.png')}); }
+	#choice4 .ui-btn {
+		background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/tasks_small.png')}); }
+	#choice5 .ui-btn {
+		background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/cases_small.png')}); }
+	#choice6 .ui-btn {
+		background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/tutorial_small.png')}); }
+	/* optionspage buttons */
+	#optionsbuttons .ui-btn {
+		padding-top: 14px;
+		padding-bottom: 14px; 
+		width: 90%;
+		margin-left:auto;
+		margin-right:auto; }
+	#optionsbuttons .ui-btn-inner {
+		border-top: none; }
+	/* align graphpage elements */
+	#graphlist .ui-controlgroup-controls {
+		/* Firefox */
+		display:-moz-box;
+		-moz-box-orient:horizontal;
+		-moz-box-pack:center;
+		-moz-box-align:center;
+		/* Safari and Chrome */
+		display:-webkit-box;
+		-webkit-box-orient:horizontal;
+		-webkit-box-pack:center;
+		-webkit-box-align:center;
+		/* W3C */
+		display:box;
+		box-orient:horizontal;
+		box-pack:center;
+		box-align:center; }
+	/* align dialog elements */
+	.dialogdetaillines p {
+		text-align:left;
+		font-weight:bold; }
+	/* remove standard close button from dialog header */
+	.ui-dialog  .ui-header .ui-btn-icon-notext { 
+		display:none; }
+	#helpset li {
+		text-align:left;
+		font-weight:bold; }
+	#screenBreak { margin:1px; }
+	/* lead and opportunity POI icons */
+	.membership {
+		content:url({!URLFOR($Resource.mobileicons, 'MobileIcons/membership_active_hires.png')}); }
+	.auto {
+		content:url({!URLFOR($Resource.mobileicons, 'MobileIcons/auto_active_hires.png')}); }
+	.home {
+		content:url({!URLFOR($Resource.mobileicons, 'MobileIcons/home_active_hires.png')}); }
+	.pup {
+		content:url({!URLFOR($Resource.mobileicons, 'MobileIcons/pup_active_hires.png')}); }
+	.other {
+		content:url({!URLFOR($Resource.mobileicons, 'MobileIcons/tutorial_large_hires.png')}); }
+	/* customer owned product icons */
+	.activeMembership {
+		content:url({!URLFOR($Resource.mobileicons, 'MobileIcons/membership_active_hires.png')}); }
+	.inactiveMembership {
+		content:url({!URLFOR($Resource.mobileicons, 'MobileIcons/membership_inactive_hires.png')}); }
+	.activeAuto {
+		content:url({!URLFOR($Resource.mobileicons, 'MobileIcons/auto_active_hires.png')}); }
+	.inactiveAuto {
+		content:url({!URLFOR($Resource.mobileicons, 'MobileIcons/auto_inactive_hires.png')}); }
+	.activeHome {
+		content:url({!URLFOR($Resource.mobileicons, 'MobileIcons/home_active_hires.png')}); }
+	.inactiveHome {
+		content:url({!URLFOR($Resource.mobileicons, 'MobileIcons/home_inactive_hires.png')}); }
+	.activePUP {
+		content:url({!URLFOR($Resource.mobileicons, 'MobileIcons/pup_active_hires.png')}); }
+	.inactivePUP {
+		content:url({!URLFOR($Resource.mobileicons, 'MobileIcons/pup_inactive_hires.png')}); }
+	
+	.ui-li-thumb {
+		max-height:40px;
+		max-width:40px; }
+	.ui-li-has-thumb .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li-has-thumb {
+		min-height:20px; 
+		padding-left:60px; }
+	/*style the notification panel*/
+	#popupPanel .ui-body-c {
+		width: 180px;
+		border: 1px solid #000;
+		border-right: none;
+		text-shadow: none; }
+	#popupPanel .ui-btn {
+		margin: 2em 15px; }
+	
+	/* device specific media queries */
+	/* standard desktop display, increase icon spacing, larger icons */
+	@media screen and (min-device-height: 765px) and (min-device-width: 1024px) {
+		#screenBreak { margin: 3em; }
+		
+		p.buttonTitle {
+		-webkit-margin-before: 0px;
+		-webkit-margin-after: 3.5em; }
+		
+		#mainchoices .ui-btn {
+		padding-top: 25px;
+		padding-bottom: 26px;
+		padding-left: 9px;
+		padding-right: 9px; }
+		
+		/* optionspage buttons */
+		#optionsbuttons .ui-btn {
+			width: 75%;
+			margin-left:auto;
+			margin-right:auto; }
+		/* detail page formatting */
+		#objectdetailpage ul {
+			width: 80%;
+			margin-left:auto;
+			margin-right:auto; }
+		#objectdetailpage ol {
+			width: 80%;
+			margin-left:auto;
+			margin-right:auto; }
+		
+		#choice1 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/leads_large.png')}); 
+			background-size: 72px 72px; }
+		#choice2 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/opptys_large.png')});
+			background-size: 72px 72px; }
+		#choice3 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/customers_large.png')});
+			background-size: 72px 72px; }
+		#choice4 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/tasks_large.png')}); 
+			background-size: 72px 72px; }
+		#choice5 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/cases_large.png')}); 
+			background-size: 72px 72px; }
+		#choice6 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/tutorial_large.png')});
+			background-size: 72px 72px; }
+	}
+	/* hires icons for iPhone Retina and Android HD displays */
+	@media only screen and (-webkit-min-device-pixel-ratio: 2) {
+		p.buttonTitle {
+		-webkit-margin-before: 0px;
+		-webkit-margin-after: 1em; }
+
+		#mainchoices .ui-btn {
+			padding-top: 19px;
+			padding-bottom: 20px;
+			padding-left: 3px;
+			padding-right: 3px; }
+			
+		#choice1 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/leads_small_hires.png')}); 
+			background-size: 60px 60px; }
+		#choice2 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/opptys_small_hires.png')});
+			background-size: 60px 60px; }
+		#choice3 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/customers_small_hires.png')});
+			background-size: 60px 60px; }
+		#choice4 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/tasks_small_hires.png')}); 
+			background-size: 60px 60px; }
+		#choice5 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/cases_small_hires.png')}); 
+			background-size: 60px 60px; }
+		#choice6 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/tutorial_small_hires.png')});
+			background-size: 60px 60px; }
+	}
+	/* devices with 4 inch and above displays, increase icon spacing */
+	@media only screen and (min-device-width: 520px) and (max-device-width: 720px) and (orientation: portrait) {
+		p.buttonTitle {
+		-webkit-margin-before: 0px;
+		-webkit-margin-after: 2.5em; }
+		
+		#screenBreak { margin: 3em; }
+	}
+	/* tablets, non HD (ipad 1/2, android tablets), larger icons, increase spacing */
+	@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+		p.buttonTitle {
+		-webkit-margin-before: 0px;
+		-webkit-margin-after: 3.5em; }
+		
+		#mainchoices .ui-btn {
+		padding-top: 25px;
+		padding-bottom: 26px;
+		padding-left: 9px;
+		padding-right: 9px; }
+		
+		#choice1 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/leads_large.png')}); 
+			background-size: 72px 72px; }
+		#choice2 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/opptys_large.png')});
+			background-size: 72px 72px; }
+		#choice3 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/customers_large.png')});
+			background-size: 72px 72px; }
+		#choice4 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/tasks_large.png')}); 
+			background-size: 72px 72px; }
+		#choice5 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/cases_large.png')}); 
+			background-size: 72px 72px; }
+		#choice6 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/tutorial_large.png')});
+			background-size: 72px 72px; }
+			
+		#screenBreak { margin: 3em; }
+	}
+	/* tablets, HD (ipad 3), hires icons, increase spacing */
+	@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
+		p.buttonTitle {
+		-webkit-margin-before: 0px;
+		-webkit-margin-after: 3.5em; }
+		
+		#mainchoices .ui-btn {
+		padding-top: 25px;
+		padding-bottom: 26px;
+		padding-left: 9px;
+		padding-right: 9px; }
+		
+		#choice1 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/leads_large_hires.png')}); 
+			background-size: 72px 72px; }
+		#choice2 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/opptys_large_hires.png')});
+			background-size: 72px 72px; }
+		#choice3 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/customers_large_hires.png')});
+			background-size: 72px 72px; }
+		#choice4 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/tasks_large_hires.png')}); 
+			background-size: 72px 72px; }
+		#choice5 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/cases_large_hires.png')}); 
+			background-size: 72px 72px; }
+		#choice6 .ui-btn {
+			background-image: url({!URLFOR($Resource.mobileicons, 'MobileIcons/tutorial_large_hires.png')});
+			background-size: 72px 72px; }
+		
+		#screenBreak { margin: 3em; }
+	}
+</style>
+</head>
+<body>
+    <!-- Home page -->
+    <div data-role="page" data-theme="b" id="mainpage" class="pages">
+        <!-- Notifications side panel -->
+        <div data-role="panel" id="popupPanel" data-position="right" data-display="overlay">
+        	<p>Notifications</p>
+		</div>
+		
+        <div data-role="header">
+            <a href='#mainpage' id="logout" class='ui-btn-left' data-icon='home' data-transition='slide' data-direction='reverse' data-theme='b' >Home</a>
+            <h1>mobileAgent</h1>
+            <a href="#popupPanel" data-rel="popup" data-position-to="window" data-role="button" data-theme='b' data-icon='info' data-iconpos='notext'></a>
+        </div>
+        <div data-role="content" id="saleslist">
+			<p id="screenBreak"/>
+			<fieldset class="ui-grid-a" id="mainchoices">
+				<div class="ui-block-a" id="choice1"></div>
+				<div class="ui-block-b" id="choice2"></div>
+				<div class="ui-block-a" id="choice3"></div>
+				<div class="ui-block-b" id="choice4"></div>
+				<div class="ui-block-a" id="choice5"></div>
+				<div class="ui-block-b" id="choice6"></div>
+			</fieldset>
+        </div>
+    </div>
+    <!-- SFDC object options page -->
+    <div data-role="page" data-theme="b" id="optionspage" class="pages">
+        <div data-role="header">
+            <a href='#mainpage' id="logout" class='ui-btn-left' data-icon='home' data-transition='slide' data-direction='reverse' data-theme='b' >Home</a>
+            <h1 id="currentoptionselection"></h1>
+			<a href='' id="backbutton" onclick="previousPage();"  class='ui-btn-right' data-icon='back' data-transition='slide' data-direction='reverse' >Back</a>
+        </div>
+        <div data-role="content" id="optionslist"></div>
+		<div id="optionsbuttons"></div>		
+    </div>
+    <!-- graphing page -->
+    <div data-role="page" data-theme="b" id="graphpage" class="pages">
+        <div data-role="header">
+            <a href='#mainpage' id="logout" class='ui-btn-left' data-icon='home' data-transition='slide' data-direction='reverse' data-theme='b' >Home</a>
+            <h1 id="currentgraphselection"></h1>
+			<a href='' id="backbutton" onclick="previousPage();"  class='ui-btn-right' data-icon='back' data-transition='slide' data-direction='reverse' >Back</a>
+        </div>
+        <div data-role="content" id="graphlist">
+            <h4 id="currentuser"></h4>
+			<h4 id="info"></h4>
+            <div id="chartdiv" class="chart"></div>
+            <br/>
+            <label for="usersearch">Filter by User:</label>
+            <input type="search" name="search" id="usersearch" value="" data-mini="true" onkeyup="eventKeyHandler(event);"/>
+            <br/>
+            <label for="radiogroup">Filter by Created Date:</label>
+            <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true" id="radiogroup">
+                    <input type="radio" name="radio-choice" id="radio-search-today" value="today" />
+                    <label for="radio-search-today">Today</label>
+                    
+                    <input type="radio" name="radio-choice" id="radio-search-week" value="week" />
+                    <label for="radio-search-week">This Week</label>
+                    
+                    <input type="radio" name="radio-choice" id="radio-search-month" value="month" checked="checked" />
+                    <label for="radio-search-month">This Month</label>
+            </fieldset>
+            <br/>
+            <input type="button" id="searchbutton" value="Filter Results" data-icon="search" data-mini="true" data-inline="true" onclick="executeSearch(event);"/>
+        </div>
+    </div>
+    <!-- SFDC Object detail page -->
+    <div data-role="page" data-theme="b" id="objectdetailpage" class="pages">
+        <div data-role="header">
+            <a href='#mainpage' id="logout" class='ui-btn-left' data-icon='home' data-transition='slide' data-direction='reverse' data-theme='b' >Home</a>
+            <h1 id="currentobjectoptionselection"></h1>
+			<a href='' id="backbutton" onclick="previousPage();"  class='ui-btn-right' data-icon='back' data-transition='slide' data-direction='reverse' >Back</a>
+        </div>
+
+        <div data-role="content" id="objectlist">
+        	<p><h3 id="currentobjectoptiontitle"></h3></p>
+			<ol id="objectDetailListOrdered" data-role="listview" data-inset="true"></ol>
+			<ul id="objectDetailListUnordered" data-role="listview" data-inset="true" data-dividertheme="a"></ul>
+			<button data-inline="true" data-icon="arrow-l" data-iconpos="notext" data-theme="a" class="detailbutton" id="prevButton" disabled="true"/>
+			<button data-inline="true" data-icon="arrow-r" data-iconpos="notext" data-theme="a" class="detailbutton" id="nextButton" disabled="true"/>
+        </div>  
+    </div>
+    <!-- SFDC Object detail page dialog window-->
+    <div data-role="dialog" data-theme="b" id="objectdetailpagedialog" class="dialogs">
+        <div data-role="header">
+            <h1 id="currentobjectdetailselection"></h1>
+        </div>
+        <div data-role="content" id="dialoglist">
+			<h3 id="currentobjectdetailtitle"></h3>
+			<div id="dialogdetails"></div>
+        </div>
+		<div data-role="footer">
+			<a href='' data-role='button' data-inline="true" data-theme="b" data-shadow="false" data-icon="delete" id='dialogclosebutton' onclick="previousPage(event);">Close</a>
+		</div>
+    </div>
+	<!-- SFDC Object confirmation page dialog window-->
+    <div data-role="dialog" data-theme="b" id="objectconfirmationdialog" class="dialogs">
+        <div data-role="header">
+            <h1 id="currentconfselection"></h1>
+        </div>
+        <div data-role="content" id="conflist">
+			<h3 id="currentconftitle"></h3>
+			<div id="confdialogdetails"></div>
+        </div>
+		<div data-role="footer">
+			<a href='#' data-rel='back' data-role='button' data-transition='pop' data-direction='reverse' data-inline="true" data-theme="b" data-shadow="false" data-icon="delete" id='configdialogclosebutton'>Close</a>
+		</div>
+    </div>
+    
+</body>
+</html>
+</apex:page>
